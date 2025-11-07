@@ -136,6 +136,7 @@
   </head>
   <body>
     <h1>Availability Tracker</h1>
+    <button id="enable">Enable notifications</button>
     <div id="content">
       <div class="sub">
         <h3>Misato</h3>
@@ -152,7 +153,6 @@
     </div>
 
     <script type="module">
-      // Import the Firebase SDKs
       import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
       import {
         getDatabase,
@@ -161,7 +161,7 @@
         set,
       } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js";
 
-      // Your Firebase config
+      // Firebase config
       const firebaseConfig = {
         apiKey: "AIzaSyBDQVLVHlNMtit_X2lrtNp5_nqVaY7vWY0",
         authDomain: "avaliability.firebaseapp.com",
@@ -178,7 +178,40 @@
       const app = initializeApp(firebaseConfig);
       const db = getDatabase(app);
 
-      // Grab checkbox elements
+      // Notification permission
+      const notificationBtn = document.getElementById("enable");
+      notificationBtn.addEventListener("click", askNotificationPermission);
+
+      function askNotificationPermission() {
+        if (!("Notification" in window)) {
+          alert("This browser does not support notifications.");
+          return;
+        }
+        Notification.requestPermission().then((permission) => {
+          if (permission === "granted") {
+            notificationBtn.style.display = "none";
+            console.log("Notifications enabled");
+          } else {
+            alert(
+              "Notifications blocked. Enable them in your browser settings."
+            );
+          }
+        });
+      }
+
+      function sendNotification(name, action, available) {
+        if (Notification.permission === "granted") {
+          const status = available
+            ? "is now available for"
+            : "is no longer available for";
+          new Notification("Availability Update", {
+            body: `${name} ${status} ${action}.`,
+            icon: "check.png",
+          });
+        }
+      }
+
+      // Get checkboxes
       const mtBox = document.getElementById("m-t");
       const ctBox = document.getElementById("c-t");
       const mcBox = document.getElementById("m-c");
@@ -186,45 +219,29 @@
       const mpBox = document.getElementById("m-p");
       const cpBox = document.getElementById("c-p");
 
-      // Sync checkbox state from Firebase
-      onValue(ref(db, "availability/m-t"), (snapshot) => {
-        mtBox.checked = snapshot.val() || false;
-      });
-      onValue(ref(db, "availability/c-t"), (snapshot) => {
-        ctBox.checked = snapshot.val() || false;
-      });
-      onValue(ref(db, "availability/m-c"), (snapshot) => {
-        mcBox.checked = snapshot.val() || false;
-      });
-      onValue(ref(db, "availability/c-c"), (snapshot) => {
-        ccBox.checked = snapshot.val() || false;
-      });
-      onValue(ref(db, "availability/m-p"), (snapshot) => {
-        mpBox.checked = snapshot.val() || false;
-      });
-      onValue(ref(db, "availability/c-p"), (snapshot) => {
-        cpBox.checked = snapshot.val() || false;
-      });
+      // Helper to setup listeners
+      function bindAvailability(box, path, name, action) {
+        let previousValue = null;
+        onValue(ref(db, path), (snapshot) => {
+          const val = snapshot.val() || false;
+          box.checked = val;
+          // Only notify if the value changed (and not on first load)
+          if (previousValue !== null && previousValue !== val) {
+            sendNotification(name, action, val);
+          }
+          previousValue = val;
+        });
 
-      // Update Firebase when checkboxes are changed
-      mtBox.addEventListener("change", () =>
-        set(ref(db, "availability/m-t"), mtBox.checked)
-      );
-      ctBox.addEventListener("change", () =>
-        set(ref(db, "availability/c-t"), ctBox.checked)
-      );
-      mcBox.addEventListener("change", () =>
-        set(ref(db, "availability/m-c"), mcBox.checked)
-      );
-      ccBox.addEventListener("change", () =>
-        set(ref(db, "availability/c-c"), ccBox.checked)
-      );
-      mpBox.addEventListener("change", () =>
-        set(ref(db, "availability/m-p"), mpBox.checked)
-      );
-      cpBox.addEventListener("change", () =>
-        set(ref(db, "availability/c-p"), cpBox.checked)
-      );
+        box.addEventListener("change", () => set(ref(db, path), box.checked));
+      }
+
+      // Set up all bindings
+      bindAvailability(mtBox, "availability/m-t", "Misato", "Talk");
+      bindAvailability(mcBox, "availability/m-c", "Misato", "Call");
+      bindAvailability(mpBox, "availability/m-p", "Misato", "Play");
+      bindAvailability(ctBox, "availability/c-t", "Chloe", "Talk");
+      bindAvailability(ccBox, "availability/c-c", "Chloe", "Call");
+      bindAvailability(cpBox, "availability/c-p", "Chloe", "Play");
     </script>
   </body>
 </html>
