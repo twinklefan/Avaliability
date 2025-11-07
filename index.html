@@ -101,6 +101,7 @@
       .sub {
         flex: 1 1 300px;
         max-width: 400px;
+        max-height: 400px;
         padding: 25px;
         border-radius: 15px;
         background: rgba(255, 255, 255, 0.2);
@@ -117,7 +118,18 @@
         }
         .sub {
           width: 90%;
-          max-width: none;
+          max-height: 140px;
+        }
+      }
+      @media screen and (max-width: 768px) {
+        h1 {
+          font-size: 7vh;
+        }
+        h3 {
+          font-size: 4vh;
+        }
+        label {
+          font-size: 3vh;
         }
       }
     </style>
