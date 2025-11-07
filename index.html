@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Availability</title>
+    <link rel="shortcut icon" href="check.png" type="image/x-icon" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Fascinate|Alef"
+      rel="stylesheet"
+    />
+    <style>
+      html {
+        /* COLOURS REMOVED: #8A65E8 */
+        background: linear-gradient(
+          45deg,
+          #e86aff,
+          #658eff,
+          #65cee8,
+          #5df5be,
+          #71d766
+        );
+        /* background: linear-gradient(125deg, #FFFFFF 0%, #000000 100%), linear-gradient(200deg, #FFD9E8 0%, #FFD9E8 50%, #DE95BA calc(50% + 1px), #DE95BA 60%, #7F4A88 calc(60% + 1px), #7F4A88 75%, #4A266A calc(75% + 1px), #4A266A 100%), linear-gradient(113deg, #FFD9E8 0%, #FFD9E8 40%, #DE95BA calc(40% + 1px), #DE95BA 50%, #7F4A88 calc(50% + 1px), #7F4A88 70%, #4A266A calc(70% + 1px), #4A266A 100%);
+        background-blend-mode: overlay, overlay, normal; */
+        background-size: 800% 800%;
+        animation: background 15s ease infinite;
+        -webkit-animation: background 15s ease infinite;
+        -moz-animation: background 15s ease infinite;
+        display: inline;
+        overflow: hidden;
+        height: 100%;
+      }
+      body {
+        line-height: 1;
+        font-weight: 400;
+        color: #fff;
+        padding: 2% 4%;
+        font-family: "Patrick Hand", cursive;
+        background-color: transparent;
+        margin: 0;
+        background-image: -webkit-repeating-radial-gradient(
+          center center,
+          rgba(255, 255, 255, 0.25),
+          rgba(255, 255, 255, 0.25) 2px,
+          transparent 2px,
+          transparent 100%
+        );
+        background-image: -moz-repeating-radial-gradient(
+          center center,
+          rgba(255, 255, 255, 0.25),
+          rgba(255, 255, 255, 0.25) 2px,
+          transparent 2px,
+          transparent 100%
+        );
+        background-image: -ms-repeating-radial-gradient(
+          center center,
+          rgba(255, 255, 255, 0.25),
+          rgba(255, 255, 255, 0.25) 2px,
+          transparent 2px,
+          transparent 100%
+        );
+        background-image: repeating-radial-gradient(
+          center center,
+          rgba(255, 255, 255, 0.25),
+          rgba(255, 255, 255, 0.25) 2px,
+          transparent 2px,
+          transparent 100%
+        );
+        -webkit-background-size: 10px 10px;
+        -moz-background-size: 10px 10px;
+        background-size: 10px 10px;
+        height: 100%;
+      }
+      h1 {
+        font-family: "Fascinate";
+        font-size: 9vh;
+        margin-top: 20px;
+        text-align: center;
+      }
+      h3 {
+        font-size: 4vh;
+        margin: 5px 0 15px 0;
+        font-family: "Alef";
+      }
+      label {
+        font-family: "Alef";
+        font-size: 3vh;
+        margin: 10px;
+      }
+      input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+      }
+      #content {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 20px;
+        text-align: center;
+      }
+      .sub {
+        flex: 1 1 300px;
+        max-width: 400px;
+        padding: 25px;
+        border-radius: 15px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(8px);
+        transition: transform 0.2s;
+      }
+      .sub:hover {
+        transform: scale(1.02);
+      }
+      @media (max-width: 700px) {
+        #content {
+          flex-direction: column;
+          align-items: center;
+        }
+        .sub {
+          width: 90%;
+          max-width: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Availability Tracker</h1>
+    <div id="content">
+      <div class="sub">
+        <h3>Misato</h3>
+        <label><input type="checkbox" id="m-t" /> Talk</label><br />
+        <label><input type="checkbox" id="m-c" /> Call</label><br />
+        <label><input type="checkbox" id="m-p" /> Play</label><br />
+      </div>
+      <div class="sub">
+        <h3>Chloe</h3>
+        <label><input type="checkbox" id="c-t" /> Talk</label><br />
+        <label><input type="checkbox" id="c-c" /> Call</label><br />
+        <label><input type="checkbox" id="c-p" /> Play</label><br />
+      </div>
+    </div>
+
+    <script type="module">
+      // Import the Firebase SDKs
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+      import {
+        getDatabase,
+        ref,
+        onValue,
+        set,
+      } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js";
+
+      // Your Firebase config
+      const firebaseConfig = {
+        apiKey: "AIzaSyBDQVLVHlNMtit_X2lrtNp5_nqVaY7vWY0",
+        authDomain: "avaliability.firebaseapp.com",
+        databaseURL:
+          "https://avaliability-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "avaliability",
+        storageBucket: "avaliability.firebasestorage.app",
+        messagingSenderId: "163231772068",
+        appId: "1:163231772068:web:291a0be7ec337e45632531",
+        measurementId: "G-60WBCXVLXX",
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const db = getDatabase(app);
+
+      // Grab checkbox elements
+      const mtBox = document.getElementById("m-t");
+      const ctBox = document.getElementById("c-t");
+      const mcBox = document.getElementById("m-c");
+      const ccBox = document.getElementById("c-c");
+      const mpBox = document.getElementById("m-p");
+      const cpBox = document.getElementById("c-p");
+
+      // Sync checkbox state from Firebase
+      onValue(ref(db, "availability/m-t"), (snapshot) => {
+        mtBox.checked = snapshot.val() || false;
+      });
+      onValue(ref(db, "availability/c-t"), (snapshot) => {
+        ctBox.checked = snapshot.val() || false;
+      });
+      onValue(ref(db, "availability/m-c"), (snapshot) => {
+        mcBox.checked = snapshot.val() || false;
+      });
+      onValue(ref(db, "availability/c-c"), (snapshot) => {
+        ccBox.checked = snapshot.val() || false;
+      });
+      onValue(ref(db, "availability/m-p"), (snapshot) => {
+        mpBox.checked = snapshot.val() || false;
+      });
+      onValue(ref(db, "availability/c-p"), (snapshot) => {
+        cpBox.checked = snapshot.val() || false;
+      });
+
+      // Update Firebase when checkboxes are changed
+      mtBox.addEventListener("change", () =>
+        set(ref(db, "availability/m-t"), mtBox.checked)
+      );
+      ctBox.addEventListener("change", () =>
+        set(ref(db, "availability/c-t"), ctBox.checked)
+      );
+      mcBox.addEventListener("change", () =>
+        set(ref(db, "availability/m-c"), mcBox.checked)
+      );
+      ccBox.addEventListener("change", () =>
+        set(ref(db, "availability/c-c"), ccBox.checked)
+      );
+      mpBox.addEventListener("change", () =>
+        set(ref(db, "availability/m-p"), mpBox.checked)
+      );
+      cpBox.addEventListener("change", () =>
+        set(ref(db, "availability/c-p"), cpBox.checked)
+      );
+    </script>
+  </body>
+</html>
