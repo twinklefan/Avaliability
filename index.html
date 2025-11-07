@@ -82,11 +82,18 @@
       }
       #enable {
         font-family: "Alef";
-        background-color: rgba(255, 255, 255, 0.239);
-        border: 2px solid #658eff;
-        border-radius: 5px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(8px);
+        border-radius: 15px;
+        border: 0px solid white;
         margin: 0 0 40px;
         text-align: center;
+        color: #ffffff;
+        padding: 4px 10px;
+      }
+      #enable:hover {
+        transition: transform 0.2s;
+        background: rgba(255, 255, 255, 0.4);
       }
       label {
         font-family: "Alef";
@@ -220,6 +227,11 @@
             body: `${name} ${status} ${action}.`,
             icon: "check.png",
           });
+          // When the notification is clicked
+          notification.onclick = function (event) {
+            event.preventDefault(); // Prevent default browser behavior
+            window.open("https://twinklefan.github.io/Avaliability/", "_blank"); // Open your page in a new tab
+          };
         }
       }
 
@@ -246,11 +258,6 @@
 
         box.addEventListener("change", () => set(ref(db, path), box.checked));
       }
-      notification.onclick = (event) => {
-        event.preventDefault(); // prevent the browser from focusing the Notification's tab
-        window.open("https://www.mozilla.org", "_blank");
-      };
-
       // Set up all bindings
       bindAvailability(mtBox, "availability/m-t", "Misato", "Talk");
       bindAvailability(mcBox, "availability/m-c", "Misato", "Call");
