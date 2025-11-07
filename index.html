@@ -72,13 +72,21 @@
       h1 {
         font-family: "Fascinate";
         font-size: 9vh;
-        margin-top: 20px;
+        margin: 20px 10px 20px;
         text-align: center;
       }
       h3 {
         font-size: 4vh;
         margin: 5px 0 15px 0;
         font-family: "Alef";
+      }
+      #enable {
+        font-family: "Alef";
+        background-color: rgba(255, 255, 255, 0.239);
+        border: 2px solid #658eff;
+        border-radius: 5px;
+        margin: 0 0 40px;
+        text-align: center;
       }
       label {
         font-family: "Alef";
@@ -130,16 +138,18 @@
         label {
           font-size: 3vh;
         }
-input[type="checkbox"] {
-        width: 50px;
-        height: 50px;
-      }
+        input[type="checkbox"] {
+          width: 50px;
+          height: 50px;
+        }
       }
     </style>
   </head>
   <body>
-    <h1>Availability Tracker</h1>
-    <button id="enable">Enable notifications</button>
+    <center>
+      <h1>Availability Tracker</h1>
+      <button id="enable">Enable notifications</button>
+    </center>
     <div id="content">
       <div class="sub">
         <h3>Misato</h3>
@@ -184,7 +194,6 @@ input[type="checkbox"] {
       // Notification permission
       const notificationBtn = document.getElementById("enable");
       notificationBtn.addEventListener("click", askNotificationPermission);
-
       function askNotificationPermission() {
         if (!("Notification" in window)) {
           alert("This browser does not support notifications.");
