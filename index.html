@@ -246,6 +246,10 @@
 
         box.addEventListener("change", () => set(ref(db, path), box.checked));
       }
+      notification.onclick = (event) => {
+        event.preventDefault(); // prevent the browser from focusing the Notification's tab
+        window.open("https://www.mozilla.org", "_blank");
+      };
 
       // Set up all bindings
       bindAvailability(mtBox, "availability/m-t", "Misato", "Talk");
