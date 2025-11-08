@@ -219,12 +219,14 @@
         });
       }
 
+      let swRegistration = null;
+
       function sendNotification(name, action, available) {
-        if (Notification.permission === "granted") {
+        if (Notification.permission === "granted" && swRegistration) {
           const status = available
             ? "is now available for"
             : "is no longer available for";
-          new Notification("Availability Update", {
+          swRegistration.showNotification("Availability Update", {
             body: `${name} ${status} ${action}.`,
             icon: "check.png",
           });
@@ -276,6 +278,7 @@
         .register("/Avaliability/firebase-messaging-sw.js")
         .then((registration) => {
           console.log("Service Worker registered:", registration);
+          swRegistration = registration;
 
           // Request permission and then getToken with the SW registration
           return Notification.requestPermission().then((permission) => {
