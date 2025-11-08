@@ -307,35 +307,35 @@
       // Show a small in-page toast for foreground messages so we don't
       // create duplicate native notifications while the page is open.
       function showToast(title, body) {
-        const id = 'fcm-toast';
+        const id = "fcm-toast";
         let t = document.getElementById(id);
         if (!t) {
-          t = document.createElement('div');
+          t = document.createElement("div");
           t.id = id;
-          t.style.position = 'fixed';
-          t.style.right = '20px';
-          t.style.bottom = '20px';
-          t.style.background = 'rgba(0,0,0,0.8)';
-          t.style.color = '#fff';
-          t.style.padding = '12px 16px';
-          t.style.borderRadius = '8px';
-          t.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
+          t.style.position = "fixed";
+          t.style.right = "20px";
+          t.style.bottom = "20px";
+          t.style.background = "rgba(0,0,0,0.8)";
+          t.style.color = "#fff";
+          t.style.padding = "12px 16px";
+          t.style.borderRadius = "8px";
+          t.style.boxShadow = "0 2px 8px rgba(0,0,0,0.3)";
           t.style.zIndex = 9999;
-          t.style.maxWidth = '320px';
-          t.style.fontFamily = 'Alef, sans-serif';
+          t.style.maxWidth = "320px";
+          t.style.fontFamily = "Alef, sans-serif";
           document.body.appendChild(t);
         }
-        t.textContent = title ? `${title} — ${body || ''}` : (body || '');
-        t.style.opacity = '1';
+        t.textContent = title ? `${title} — ${body || ""}` : body || "";
+        t.style.opacity = "1";
         // Auto hide after 5s
         clearTimeout(t._hideTimeout);
         t._hideTimeout = setTimeout(() => {
-          if (t) t.style.opacity = '0';
+          if (t) t.style.opacity = "0";
         }, 5000);
       }
 
       onMessage(messaging, (payload) => {
-        console.log('Message received (foreground):', payload);
+        console.log("Message received (foreground):", payload);
         // Avoid creating a native Notification here; let the service worker
         // handle background notifications. Show an in-page toast instead.
         const title = payload?.notification?.title || payload?.data?.title;
