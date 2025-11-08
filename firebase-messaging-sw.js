@@ -1,6 +1,6 @@
-// Import Firebase scripts
-importScripts("https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js");
-importScripts("https://www.gstatic.com/firebasejs/12.5.0/firebase-messaging.js");
+// Import Firebase compat scripts (these expose the namespaced global used below)
+importScripts("https://www.gstatic.com/firebasejs/12.5.0/firebase-app-compat.js");
+importScripts("https://www.gstatic.com/firebasejs/12.5.0/firebase-messaging-compat.js");
 
 // Initialize Firebase
 firebase.initializeApp({
