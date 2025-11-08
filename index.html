@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <title>Availability</title>
+    <link rel="manifest" href="manifest.json" />
     <link rel="shortcut icon" href="check.png" type="image/x-icon" />
     <link
       href="https://fonts.googleapis.com/css?family=Fascinate|Alef"
@@ -34,7 +35,6 @@
         font-weight: 400;
         color: #fff;
         padding: 2% 4%;
-        font-family: "Patrick Hand", cursive;
         background-color: transparent;
         margin: 0;
         background-image: -webkit-repeating-radial-gradient(
@@ -73,13 +73,28 @@
       h1 {
         font-family: "Fascinate";
         font-size: 9vh;
-        margin-top: 20px;
+        margin: 20px 10px 20px;
         text-align: center;
       }
       h3 {
         font-size: 4vh;
         margin: 5px 0 15px 0;
         font-family: "Alef";
+      }
+      #enable {
+        font-family: "Alef";
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(8px);
+        border-radius: 15px;
+        border: 0px solid white;
+        margin: 0 0 40px;
+        text-align: center;
+        color: #ffffff;
+        padding: 4px 10px;
+      }
+      #enable:hover {
+        transition: transform 0.2s;
+        background: rgba(255, 255, 255, 0.4);
       }
       label {
         font-family: "Alef";
@@ -131,12 +146,18 @@
         label {
           font-size: 3vh;
         }
+        input[type="checkbox"] {
+          width: 50px;
+          height: 50px;
+        }
       }
     </style>
   </head>
   <body>
-    <h1>Availability Tracker</h1>
-    <button id="enable">Enable notifications</button>
+    <center>
+      <h1>Availability Tracker</h1>
+      <button id="enable">Enable notifications</button>
+    </center>
     <div id="content">
       <div class="sub">
         <h3>Misato</h3>
@@ -181,7 +202,6 @@
       // Notification permission
       const notificationBtn = document.getElementById("enable");
       notificationBtn.addEventListener("click", askNotificationPermission);
-
       function askNotificationPermission() {
         if (!("Notification" in window)) {
           alert("This browser does not support notifications.");
@@ -199,12 +219,14 @@
         });
       }
 
+      let swRegistration = null;
+
       function sendNotification(name, action, available) {
-        if (Notification.permission === "granted") {
+        if (Notification.permission === "granted" && swRegistration) {
           const status = available
             ? "is now available for"
             : "is no longer available for";
-          new Notification("Availability Update", {
+          swRegistration.showNotification("Availability Update", {
             body: `${name} ${status} ${action}.`,
             icon: "check.png",
           });
@@ -234,7 +256,6 @@
 
         box.addEventListener("change", () => set(ref(db, path), box.checked));
       }
-
       // Set up all bindings
       bindAvailability(mtBox, "availability/m-t", "Misato", "Talk");
       bindAvailability(mcBox, "availability/m-c", "Misato", "Call");
@@ -242,6 +263,55 @@
       bindAvailability(ctBox, "availability/c-t", "Chloe", "Talk");
       bindAvailability(ccBox, "availability/c-c", "Chloe", "Call");
       bindAvailability(cpBox, "availability/c-p", "Chloe", "Play");
+
+      import {
+        getMessaging,
+        getToken,
+        onMessage,
+      } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-messaging.js";
+
+      const messaging = getMessaging(app);
+
+      // Register the service worker at the site root and then request permission
+      // and get an FCM token that is tied to that service worker registration.
+      navigator.serviceWorker
+        .register("/Avaliability/firebase-messaging-sw.js")
+        .then((registration) => {
+          console.log("Service Worker registered:", registration);
+          swRegistration = registration;
+
+          // Request permission and then getToken with the SW registration
+          return Notification.requestPermission().then((permission) => {
+            if (permission === "granted") {
+              return getToken(messaging, {
+                vapidKey:
+                  "BAsspzadOkEXFR1a5I9x1NJJAEoqbnaU0PABL6I9BFOJiBOuKKXhDmlZWaPYTe1wnFt9_ElBH3CV5Lar-TiFx_M",
+                serviceWorkerRegistration: registration,
+              })
+                .then((currentToken) => {
+                  if (currentToken) {
+                    console.log("FCM Token:", currentToken);
+                  } else {
+                    console.log("No registration token available.");
+                  }
+                })
+                .catch((err) => console.error("Token retrieval error:", err));
+            } else {
+              console.log("Notification permission not granted");
+            }
+          });
+        })
+        .catch((err) =>
+          console.error("Service Worker registration failed:", err)
+        );
+
+      onMessage(messaging, (payload) => {
+        console.log("Message received:", payload);
+        new Notification(payload.notification.title, {
+          body: payload.notification.body,
+          icon: "check.png",
+        });
+      });
     </script>
   </body>
 </html>
