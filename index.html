@@ -273,32 +273,34 @@
       // Register the service worker at the site root and then request permission
       // and get an FCM token that is tied to that service worker registration.
       navigator.serviceWorker
-        .register('/firebase-messaging-sw.js')
+        .register("/firebase-messaging-sw.js")
         .then((registration) => {
-          console.log('Service Worker registered:', registration);
+          console.log("Service Worker registered:", registration);
 
           // Request permission and then getToken with the SW registration
           return Notification.requestPermission().then((permission) => {
-            if (permission === 'granted') {
+            if (permission === "granted") {
               return getToken(messaging, {
                 vapidKey:
-                  'BAsspzadOkEXFR1a5I9x1NJJAEoqbnaU0PABL6I9BFOJiBOuKKXhDmlZWaPYTe1wnFt9_ElBH3CV5Lar-TiFx_M',
+                  "BAsspzadOkEXFR1a5I9x1NJJAEoqbnaU0PABL6I9BFOJiBOuKKXhDmlZWaPYTe1wnFt9_ElBH3CV5Lar-TiFx_M",
                 serviceWorkerRegistration: registration,
               })
                 .then((currentToken) => {
                   if (currentToken) {
-                    console.log('FCM Token:', currentToken);
+                    console.log("FCM Token:", currentToken);
                   } else {
-                    console.log('No registration token available.');
+                    console.log("No registration token available.");
                   }
                 })
-                .catch((err) => console.error('Token retrieval error:', err));
+                .catch((err) => console.error("Token retrieval error:", err));
             } else {
-              console.log('Notification permission not granted');
+              console.log("Notification permission not granted");
             }
           });
         })
-        .catch((err) => console.error('Service Worker registration failed:', err));
+        .catch((err) =>
+          console.error("Service Worker registration failed:", err)
+        );
 
       onMessage(messaging, (payload) => {
         console.log("Message received:", payload);
