@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <title>Availability</title>
+    <link rel="manifest" href="manifest.json" />
     <link rel="shortcut icon" href="check.png" type="image/x-icon" />
     <link
       href="https://fonts.googleapis.com/css?family=Fascinate|Alef"
@@ -171,7 +172,7 @@
         <label><input type="checkbox" id="c-p" /> Play</label><br />
       </div>
     </div>
-
+    <script src="firebase-messaging-sw.js"></script>
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
       import {
@@ -260,6 +261,43 @@
       bindAvailability(ctBox, "availability/c-t", "Chloe", "Talk");
       bindAvailability(ccBox, "availability/c-c", "Chloe", "Call");
       bindAvailability(cpBox, "availability/c-p", "Chloe", "Play");
+      import {
+        getMessaging,
+        getToken,
+        onMessage,
+      } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-messaging.js";
+
+      const messaging = getMessaging(app);
+
+      navigator.serviceWorker
+        .register("firebase-messaging-sw.js")
+        .then((registration) => {
+          console.log("Service Worker registered:", registration);
+        });
+
+      Notification.requestPermission().then((permission) => {
+        if (permission === "granted") {
+          getToken(messaging, {
+            vapidKey: "YOUR_WEB_PUSH_CERTIFICATE_KEY_PAIR",
+          })
+            .then((currentToken) => {
+              if (currentToken) {
+                console.log("FCM Token:", currentToken);
+              } else {
+                console.log("No registration token available.");
+              }
+            })
+            .catch((err) => console.error("Token retrieval error:", err));
+        }
+      });
+
+      onMessage(messaging, (payload) => {
+        console.log("Message received:", payload);
+        new Notification(payload.notification.title, {
+          body: payload.notification.body,
+          icon: "check.png",
+        });
+      });
     </script>
   </body>
 </html>
