@@ -172,7 +172,7 @@
         <label><input type="checkbox" id="c-p" /> Play</label><br />
       </div>
     </div>
-    <script src="firebase-messaging-sw.js"></script>
+
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
       import {
@@ -261,6 +261,7 @@
       bindAvailability(ctBox, "availability/c-t", "Chloe", "Talk");
       bindAvailability(ccBox, "availability/c-c", "Chloe", "Call");
       bindAvailability(cpBox, "availability/c-p", "Chloe", "Play");
+
       import {
         getMessaging,
         getToken,
@@ -278,7 +279,8 @@
       Notification.requestPermission().then((permission) => {
         if (permission === "granted") {
           getToken(messaging, {
-            vapidKey: "YOUR_WEB_PUSH_CERTIFICATE_KEY_PAIR",
+            vapidKey:
+              "BAsspzadOkEXFR1a5I9x1NJJAEoqbnaU0PABL6I9BFOJiBOuKKXhDmlZWaPYTe1wnFt9_ElBH3CV5Lar-TiFx_M",
           })
             .then((currentToken) => {
               if (currentToken) {

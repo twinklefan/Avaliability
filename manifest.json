@@ -1,7 +1,7 @@
 {
   "name": "Availability Tracker",
   "short_name": "Availability",
-  "start_url": "/",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#5df5be",
   "theme_color": "#658eff",
